@@ -3,46 +3,436 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎁 Claim Your Free Gift!</title>
+  <title>🎁 Spin to Win Surprise Cash!</title>
   <style>
-    body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); margin:0; padding:20px; min-height:100vh; }
-    .container { max-width: 420px; margin: 40px auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); overflow: hidden; }
-    .header { background: #ff6b6b; color: white; text-align: center; padding: 30px 20px; }
-    .header h1 { margin:0; font-size: 28px; }
-    .content { padding: 30px; }
-    input { width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; }
-    input:focus { border-color: #ff6b6b; outline: none; }
-    button { width: 100%; padding: 16px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; }
-    button:disabled { background: #ccc; }
-    .success { display: none; text-align: center; padding: 40px 20px; color: #28a745; font-size: 22px; }
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap');
+
+    :root {
+      --gold: #ffd700;
+      --red: #ff3b5c;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f06292 100%);
+      background-attachment: fixed;
+      margin: 0;
+      padding: 20px 10px;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .container {
+      max-width: 420px;
+      margin: 20px auto;
+      background: white;
+      border-radius: 28px;
+      box-shadow: 0 25px 70px rgba(0,0,0,0.38);
+      overflow: hidden;
+      position: relative;
+      z-index: 2;
+    }
+
+    @media (max-width: 480px) {
+      .container { margin: 15px auto; border-radius: 20px; }
+      .wheel { width: 260px !important; height: 260px !important; }
+      .label { font-size: 14px !important; width: 80px !important; }
+    }
+
+    .floating-gift {
+      position: absolute;
+      font-size: 36px;
+      opacity: 0.18;
+      animation: float 15s infinite linear;
+      z-index: 0;
+      pointer-events: none;
+    }
+    @keyframes float {
+      0% { transform: translateY(120vh) rotate(0deg); }
+      100% { transform: translateY(-120vh) rotate(720deg); }
+    }
+
+    .header {
+      background: linear-gradient(135deg, #ff3b5c, #ffd700);
+      color: white;
+      text-align: center;
+      padding: 35px 20px;
+      position: relative;
+    }
+    .header h1 {
+      margin: 0;
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      text-shadow: 4px 4px 10px rgba(0,0,0,0.4);
+    }
+    .header p {
+      margin: 10px 0 0;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .content {
+      padding: 25px;
+    }
+
+    .wheel-container {
+      position: relative;
+      width: 280px;
+      height: 280px;
+      margin: 0 auto 20px;
+    }
+
+    .wheel {
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      border: 16px solid #ffd700;
+      box-shadow: 0 15px 45px rgba(0,0,0,0.35),
+                  inset 0 10px 25px rgba(255,255,255,0.6),
+                  inset 0 -10px 25px rgba(0,0,0,0.25);
+      position: relative;
+      transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1);
+      overflow: hidden;
+    }
+
+    .label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform-origin: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: white;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+      width: 90px;
+      text-align: center;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .pointer {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 50px;
+      z-index: 10;
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,0.5));
+      animation: pointerShake 0.8s infinite alternate;
+    }
+    @keyframes pointerShake {
+      from { transform: translateX(-50%) rotate(-10deg); }
+      to   { transform: translateX(-50%) rotate(10deg); }
+    }
+
+    #spinBtn {
+      width: 100%;
+      max-width: 280px;
+      margin: 10px auto;
+      display: block;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--red), #ff8a00);
+      color: white;
+      border: none;
+      border-radius: 18px;
+      font-size: 19px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(255,59,92,0.45);
+      transition: all 0.3s;
+    }
+    #spinBtn:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+
+    #winMessage {
+      display: none;
+      font-size: 26px;
+      font-weight: 700;
+      color: #c8102e;
+      margin: 20px 0 15px;
+      text-align: center;
+      animation: surprisePop 0.8s ease forwards;
+    }
+    #winMessage span {
+      font-size: 58px;
+      display: block;
+      margin: 8px 0;
+      color: #ffd700;
+      text-shadow: 0 0 20px #ffd700;
+    }
+    @keyframes surprisePop {
+      0% { transform: scale(0.4) rotate(-15deg); opacity: 0; }
+      70% { transform: scale(1.15) rotate(8deg); }
+      100% { transform: scale(1) rotate(0); }
+    }
+
+    #claimSection {
+      display: none;
+      padding: 25px;
+      border-top: 3px solid #ffd700;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.8s ease-out;
+    }
+
+    #claimSection.visible {
+      opacity: 1;
+      transform: translateY(0);
+      animation: focusPulse 2.5s ease-in-out;
+    }
+
+    @keyframes focusPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255,59,92,0.4); }
+      50%      { box-shadow: 0 0 0 15px rgba(255,59,92,0.0); }
+    }
+
+    input {
+      width: 100%;
+      padding: 15px;
+      margin: 12px 0;
+      border: 3px solid #ddd;
+      border-radius: 16px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    input:focus {
+      border-color: var(--red);
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(255,59,92,0.2);
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--red), #ff8a00);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(255,59,92,0.4);
+    }
+
+    #successSection {
+      display: none;
+      padding: 45px 25px;
+      text-align: center;
+      background: linear-gradient(135deg, rgba(40,167,69,0.12), rgba(40,167,69,0.05));
+    }
+    #successSection h2 {
+      font-size: 30px;
+      color: #28a745;
+      margin-bottom: 15px;
+    }
   </style>
 </head>
 <body>
 
+<div class="floating-gift" style="left:10%; animation-delay:0s;">🎁</div>
+<div class="floating-gift" style="left:32%; animation-delay:2.5s;">💰</div>
+<div class="floating-gift" style="left:58%; animation-delay:1s;">🏆</div>
+<div class="floating-gift" style="left:78%; animation-delay:4.8s;">💎</div>
+
 <div class="container">
   <div class="header">
-    <h1>🎁 Claim Your Free Gift Now!</h1>
-    <p>Only 1 claim per person • Limited stock</p>
-  </div>
-  
-  <div class="content" id="formSection">
-    <form id="claimForm">
-      <input type="text" id="name" name="name" placeholder="Enter your full name" required>
-      <input type="tel" id="mobile" name="mobile" placeholder="Enter 10-digit mobile number" maxlength="10" required>
-      <button type="submit" id="submitBtn">CLAIM MY FREE GIFT</button>
-    </form>
+    <h1>🎁 Spin & Win Surprise Cash!</h1>
+    <p>Unlimited spins • Try your luck again & again!</p>
   </div>
 
-  <div class="success" id="successSection">
+  <div id="spinnerSection">
+    <div class="content">
+      <h2 style="font-size:22px; margin-bottom:18px; color:#333; text-align:center;">
+        Spin the wheel — win surprise cash!
+      </h2>
+      
+      <div class="wheel-container">
+        <div class="wheel" id="wheel"></div>
+        <div class="pointer">▼</div>
+      </div>
+
+      <button id="spinBtn">SPIN NOW!</button>
+    </div>
+  </div>
+
+  <div id="winMessage"></div>
+
+  <div id="claimSection">
+    <div class="content">
+      <h2 style="text-align:center; color:#222; margin-bottom:20px; font-size:22px;">
+        Claim Your Prize
+      </h2>
+      <form id="claimForm">
+        <input type="text" id="name" placeholder="Full name" required>
+        <input type="tel" id="mobile" placeholder="10-digit mobile number" maxlength="10" required>
+        <button type="submit" id="submitBtn">CLAIM ₹<span id="claimPrize">---</span> NOW</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="successSection">
     <h2>✅ Claim Successful!</h2>
-    <p>Your free gift details have been sent to your mobile number.</p>
-    <p>Thank you! 🎉</p>
+    <p>Your <strong>₹<span id="successPrize">---</span></strong> prize details have been sent to your mobile.</p>
+    <p>Thank you! Keep spinning for more chances 🎉</p>
   </div>
 </div>
 
 <script>
 // === CHANGE THIS LINE ONLY ===
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwGeuB3EKBtSyDNKWLOQ4xPrKdvBgO9OlpXoeYVdDemeLeHAvhYgktLPz1InjaX_K4/exec";  // ← Paste your Web app URL here
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwGeuB3EKBtSyDNKWLOQ4xPrKdvBgO9OlpXoeYVdDemeLeHAvhYgktLPz1InjaX_K4/exec";
+
+const prizes = [
+  { amount: 0,    text: "₹0",     color: "#95a5a6" },
+  { amount: 99,   text: "₹99",    color: "#ff4757" },
+  { amount: 199,  text: "₹199",   color: "#2ed573" },
+  { amount: 399,  text: "₹399",   color: "#1e90ff" },
+  { amount: 699,  text: "₹699",   color: "#ffa502" },
+  { amount: 999,  text: "₹999",   color: "#ff6348" },
+  { amount: 1499, text: "₹1,499", color: "#3742fa" }
+];
+
+let wheel;
+let currentWinAmount = 0;
+let isSpinning = false;
+
+const numSegments = prizes.length;
+const segmentAngle = 360 / numSegments;
+
+// ────────────────────────────────────────────────
+//          Web Audio API - Sound Effects
+// ────────────────────────────────────────────────
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playSpinSound(duration = 5) {
+  if (!audioCtx) return;
+
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(60, audioCtx.currentTime + duration * 0.7);
+
+  gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.start();
+  osc.stop(audioCtx.currentTime + duration);
+}
+
+function playWinSound(isWin = true) {
+  if (!audioCtx) return;
+
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(isWin ? 680 : 320, now);
+  osc.frequency.setValueAtTime(isWin ? 880 : 280, now + 0.08);
+  osc.frequency.setValueAtTime(isWin ? 980 : 240, now + 0.18);
+
+  gain.gain.setValueAtTime(0.25, now);
+  gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.start(now);
+  osc.stop(now + 0.45);
+}
+
+// ────────────────────────────────────────────────
+//          Wheel Initialization & Logic
+// ────────────────────────────────────────────────
+
+window.addEventListener('DOMContentLoaded', initWheel);
+
+function initWheel() {
+  wheel = document.getElementById('wheel');
+  
+  let gradient = prizes.map((p, i) => 
+    `${p.color} ${i * segmentAngle}deg ${(i + 1) * segmentAngle}deg`
+  ).join(', ');
+  
+  wheel.style.background = `conic-gradient(${gradient})`;
+
+  for (let i = 0; i < numSegments; i++) {
+    const label = document.createElement('div');
+    label.className = 'label';
+    label.textContent = prizes[i].text;
+    
+    const rotation = i * segmentAngle + (segmentAngle / 2);
+    const translateY = -105;
+    
+    label.style.transform = `translate(-50%, -50%) rotate(${rotation}deg) translateY(${translateY}px) rotate(-${rotation}deg)`;
+    wheel.appendChild(label);
+  }
+}
+
+document.getElementById('spinBtn').addEventListener('click', function() {
+  if (isSpinning) return;
+  
+  isSpinning = true;
+  this.disabled = true;
+  this.textContent = "SPINNING... 🎰";
+
+  // Start spinning sound
+  playSpinSound(5.2);
+
+  const winIndex = Math.floor(Math.random() * numSegments);
+  const winPrize = prizes[winIndex];
+  currentWinAmount = winPrize.amount;
+
+  const extraSpins = 8 + Math.floor(Math.random() * 3);
+  const targetOffset = winIndex * segmentAngle + (segmentAngle / 2);
+  const finalRotation = (extraSpins * 360) + (360 - targetOffset);
+
+  wheel.style.transition = 'transform 5s cubic-bezier(0.25, 0.1, 0.25, 1)';
+  wheel.style.transform = `rotate(${finalRotation}deg)`;
+
+  setTimeout(() => {
+    const winMsg = document.getElementById('winMessage');
+    winMsg.innerHTML = currentWinAmount === 0 
+      ? `😔 Better luck next time!<br><span>₹0</span>`
+      : `🎉 YOU WON!<br><span>₹${currentWinAmount}</span>`;
+    winMsg.style.display = 'block';
+
+    // Play win/lose sound
+    playWinSound(currentWinAmount > 0);
+
+    // Show and focus claim section
+    const claimSection = document.getElementById('claimSection');
+    document.getElementById('claimPrize').textContent = currentWinAmount;
+    claimSection.style.display = 'block';
+    
+    setTimeout(() => {
+      claimSection.classList.add('visible');
+      claimSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
+
+    // Reset spin button
+    const btn = document.getElementById('spinBtn');
+    btn.textContent = "SPIN AGAIN!";
+    btn.disabled = false;
+    isSpinning = false;
+
+    // Reset wheel visually
+    setTimeout(() => {
+      wheel.style.transition = 'none';
+      wheel.style.transform = 'rotate(0deg)';
+      setTimeout(() => {
+        wheel.style.transition = 'transform 5s cubic-bezier(0.25, 0.1, 0.25, 1)';
+      }, 50);
+    }, 1000);
+  }, 5200);
+});
 
 document.getElementById('claimForm').addEventListener('submit', async function(e) {
   e.preventDefault();
@@ -50,7 +440,6 @@ document.getElementById('claimForm').addEventListener('submit', async function(e
   const name = document.getElementById('name').value.trim();
   const mobile = document.getElementById('mobile').value.trim();
   
-  // Simple Indian mobile validation
   if (!/^[6-9]\d{9}$/.test(mobile)) {
     alert("Please enter a valid 10-digit Indian mobile number");
     return;
@@ -63,18 +452,21 @@ document.getElementById('claimForm').addEventListener('submit', async function(e
   const formData = new FormData();
   formData.append("name", name);
   formData.append("mobile", mobile);
+  formData.append("prize", currentWinAmount);
 
   try {
     const res = await fetch(SCRIPT_URL, {
       method: "POST",
       body: formData
     });
-    
     const data = await res.json();
     
     if (data.status === "success") {
-      document.getElementById('formSection').style.display = "none";
+      document.getElementById('claimSection').style.display = "none";
+      document.getElementById('winMessage').style.display = "none";
+      document.getElementById('successPrize').textContent = currentWinAmount;
       document.getElementById('successSection').style.display = "block";
+      document.getElementById('successSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
     } else {
       alert("Something went wrong. Please try again.");
     }
@@ -82,7 +474,7 @@ document.getElementById('claimForm').addEventListener('submit', async function(e
     alert("Connection error. Please check your internet.");
   }
   
-  btn.textContent = "CLAIM MY FREE GIFT";
+  btn.textContent = `CLAIM ₹${currentWinAmount} NOW`;
   btn.disabled = false;
 });
 </script>
