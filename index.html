@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎁 Claim Your Free Gift!</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); margin:0; padding:20px; min-height:100vh; }
+    .container { max-width: 420px; margin: 40px auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); overflow: hidden; }
+    .header { background: #ff6b6b; color: white; text-align: center; padding: 30px 20px; }
+    .header h1 { margin:0; font-size: 28px; }
+    .content { padding: 30px; }
+    input { width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; }
+    input:focus { border-color: #ff6b6b; outline: none; }
+    button { width: 100%; padding: 16px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; }
+    button:disabled { background: #ccc; }
+    .success { display: none; text-align: center; padding: 40px 20px; color: #28a745; font-size: 22px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>🎁 Claim Your Free Gift Now!</h1>
+    <p>Only 1 claim per person • Limited stock</p>
+  </div>
+  
+  <div class="content" id="formSection">
+    <form id="claimForm">
+      <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+      <input type="tel" id="mobile" name="mobile" placeholder="Enter 10-digit mobile number" maxlength="10" required>
+      <button type="submit" id="submitBtn">CLAIM MY FREE GIFT</button>
+    </form>
+  </div>
+
+  <div class="success" id="successSection">
+    <h2>✅ Claim Successful!</h2>
+    <p>Your free gift details have been sent to your mobile number.</p>
+    <p>Thank you! 🎉</p>
+  </div>
+</div>
+
+<script>
+// === CHANGE THIS LINE ONLY ===
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwGeuB3EKBtSyDNKWLOQ4xPrKdvBgO9OlpXoeYVdDemeLeHAvhYgktLPz1InjaX_K4/exec";  // ← Paste your Web app URL here
+
+document.getElementById('claimForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const name = document.getElementById('name').value.trim();
+  const mobile = document.getElementById('mobile').value.trim();
+  
+  // Simple Indian mobile validation
+  if (!/^[6-9]\d{9}$/.test(mobile)) {
+    alert("Please enter a valid 10-digit Indian mobile number");
+    return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.textContent = "Processing...";
+  btn.disabled = true;
+
+  const formData = new FormData();
+  formData.append("name", name);
+  formData.append("mobile", mobile);
+
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: formData
+    });
+    
+    const data = await res.json();
+    
+    if (data.status === "success") {
+      document.getElementById('formSection').style.display = "none";
+      document.getElementById('successSection').style.display = "block";
+    } else {
+      alert("Something went wrong. Please try again.");
+    }
+  } catch(err) {
+    alert("Connection error. Please check your internet.");
+  }
+  
+  btn.textContent = "CLAIM MY FREE GIFT";
+  btn.disabled = false;
+});
+</script>
+
+</body>
+</html>
