@@ -37,7 +37,6 @@
     @media (max-width: 480px) {
       .container { margin: 15px auto; border-radius: 20px; }
       .wheel { width: 260px !important; height: 260px !important; }
-      .label { font-size: 14px !important; width: 80px !important; }
     }
 
     .floating-gift {
@@ -176,45 +175,27 @@
       opacity: 0;
       transform: translateY(20px);
       transition: all 0.8s ease-out;
+      text-align: center;
     }
 
     #claimSection.visible {
       opacity: 1;
       transform: translateY(0);
-      animation: focusPulse 2.5s ease-in-out;
     }
 
-    @keyframes focusPulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(255,59,92,0.4); }
-      50%      { box-shadow: 0 0 0 15px rgba(255,59,92,0.0); }
-    }
-
-    input {
+    #claimBtn {
       width: 100%;
-      padding: 15px;
-      margin: 12px 0;
-      border: 3px solid #ddd;
-      border-radius: 16px;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
-    input:focus {
-      border-color: var(--red);
-      outline: none;
-      box-shadow: 0 0 0 4px rgba(255,59,92,0.2);
-    }
-
-    button[type="submit"] {
-      width: 100%;
+      max-width: 280px;
+      margin: 20px auto 0;
       padding: 16px;
       background: linear-gradient(135deg, var(--red), #ff8a00);
       color: white;
       border: none;
-      border-radius: 16px;
-      font-size: 18px;
+      border-radius: 18px;
+      font-size: 19px;
       font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 8px 20px rgba(255,59,92,0.4);
+      box-shadow: 0 10px 25px rgba(255,59,92,0.45);
     }
 
     #successSection {
@@ -265,24 +246,19 @@
       <h2 style="text-align:center; color:#222; margin-bottom:20px; font-size:22px;">
         Claim Your Prize
       </h2>
-      <form id="claimForm">
-        <input type="text" id="name" placeholder="Full name" required>
-        <input type="tel" id="mobile" placeholder="10-digit mobile number" maxlength="10" required>
-        <button type="submit" id="submitBtn">CLAIM ₹<span id="claimPrize">---</span> NOW</button>
-      </form>
+      <button id="claimBtn">CLAIM ₹<span id="claimPrize">---</span></button>
     </div>
   </div>
 
   <div id="successSection">
-    <h2>✅ Claim Successful!</h2>
-    <p>Your <strong>₹<span id="successPrize">---</span></strong> prize details have been sent to your mobile.</p>
-    <p>Thank you! Keep spinning for more chances 🎉</p>
+    <h2>✅ Redirecting...</h2>
+    <p>You are being taken to Google.com</p>
   </div>
 </div>
 
 <script>
-// === CHANGE THIS LINE ONLY ===
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwGeuB3EKBtSyDNKWLOQ4xPrKdvBgO9OlpXoeYVdDemeLeHAvhYgktLPz1InjaX_K4/exec";
+// === Google redirect only — no backend needed anymore ===
+const GOOGLE_URL = "https://pat.com/CandyLove";
 
 const prizes = [
   { amount: 0,    text: "₹0",     color: "#95a5a6" },
@@ -301,76 +277,56 @@ let isSpinning = false;
 const numSegments = prizes.length;
 const segmentAngle = 360 / numSegments;
 
-// ────────────────────────────────────────────────
-//          Web Audio API - Sound Effects
-// ────────────────────────────────────────────────
+// Sound effects (kept from original)
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 function playSpinSound(duration = 5) {
   if (!audioCtx) return;
-
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
-
   osc.type = 'sawtooth';
   osc.frequency.setValueAtTime(180, audioCtx.currentTime);
   osc.frequency.exponentialRampToValueAtTime(60, audioCtx.currentTime + duration * 0.7);
-
   gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-
   osc.connect(gain);
   gain.connect(audioCtx.destination);
-
   osc.start();
   osc.stop(audioCtx.currentTime + duration);
 }
 
 function playWinSound(isWin = true) {
   if (!audioCtx) return;
-
   const now = audioCtx.currentTime;
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
-
   osc.type = 'triangle';
   osc.frequency.setValueAtTime(isWin ? 680 : 320, now);
   osc.frequency.setValueAtTime(isWin ? 880 : 280, now + 0.08);
   osc.frequency.setValueAtTime(isWin ? 980 : 240, now + 0.18);
-
   gain.gain.setValueAtTime(0.25, now);
   gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
-
   osc.connect(gain);
   gain.connect(audioCtx.destination);
-
   osc.start(now);
   osc.stop(now + 0.45);
 }
-
-// ────────────────────────────────────────────────
-//          Wheel Initialization & Logic
-// ────────────────────────────────────────────────
 
 window.addEventListener('DOMContentLoaded', initWheel);
 
 function initWheel() {
   wheel = document.getElementById('wheel');
-  
   let gradient = prizes.map((p, i) => 
     `${p.color} ${i * segmentAngle}deg ${(i + 1) * segmentAngle}deg`
   ).join(', ');
-  
   wheel.style.background = `conic-gradient(${gradient})`;
 
   for (let i = 0; i < numSegments; i++) {
     const label = document.createElement('div');
     label.className = 'label';
     label.textContent = prizes[i].text;
-    
     const rotation = i * segmentAngle + (segmentAngle / 2);
     const translateY = -105;
-    
     label.style.transform = `translate(-50%, -50%) rotate(${rotation}deg) translateY(${translateY}px) rotate(-${rotation}deg)`;
     wheel.appendChild(label);
   }
@@ -383,7 +339,6 @@ document.getElementById('spinBtn').addEventListener('click', function() {
   this.disabled = true;
   this.textContent = "SPINNING... 🎰";
 
-  // Start spinning sound
   playSpinSound(5.2);
 
   const winIndex = Math.floor(Math.random() * numSegments);
@@ -404,10 +359,8 @@ document.getElementById('spinBtn').addEventListener('click', function() {
       : `🎉 YOU WON!<br><span>₹${currentWinAmount}</span>`;
     winMsg.style.display = 'block';
 
-    // Play win/lose sound
     playWinSound(currentWinAmount > 0);
 
-    // Show and focus claim section
     const claimSection = document.getElementById('claimSection');
     document.getElementById('claimPrize').textContent = currentWinAmount;
     claimSection.style.display = 'block';
@@ -417,13 +370,11 @@ document.getElementById('spinBtn').addEventListener('click', function() {
       claimSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 300);
 
-    // Reset spin button
     const btn = document.getElementById('spinBtn');
     btn.textContent = "SPIN AGAIN!";
     btn.disabled = false;
     isSpinning = false;
 
-    // Reset wheel visually
     setTimeout(() => {
       wheel.style.transition = 'none';
       wheel.style.transform = 'rotate(0deg)';
@@ -434,48 +385,14 @@ document.getElementById('spinBtn').addEventListener('click', function() {
   }, 5200);
 });
 
-document.getElementById('claimForm').addEventListener('submit', async function(e) {
-  e.preventDefault();
+// === CLAIM BUTTON → Open Google ===
+document.getElementById('claimBtn').addEventListener('click', function() {
+  window.open(GOOGLE_URL, '_blank');
   
-  const name = document.getElementById('name').value.trim();
-  const mobile = document.getElementById('mobile').value.trim();
-  
-  if (!/^[6-9]\d{9}$/.test(mobile)) {
-    alert("Please enter a valid 10-digit Indian mobile number");
-    return;
-  }
-
-  const btn = document.getElementById('submitBtn');
-  btn.textContent = "Processing...";
-  btn.disabled = true;
-
-  const formData = new FormData();
-  formData.append("name", name);
-  formData.append("mobile", mobile);
-  formData.append("prize", currentWinAmount);
-
-  try {
-    const res = await fetch(SCRIPT_URL, {
-      method: "POST",
-      body: formData
-    });
-    const data = await res.json();
-    
-    if (data.status === "success") {
-      document.getElementById('claimSection').style.display = "none";
-      document.getElementById('winMessage').style.display = "none";
-      document.getElementById('successPrize').textContent = currentWinAmount;
-      document.getElementById('successSection').style.display = "block";
-      document.getElementById('successSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
-    } else {
-      alert("Something went wrong. Please try again.");
-    }
-  } catch(err) {
-    alert("Connection error. Please check your internet.");
-  }
-  
-  btn.textContent = `CLAIM ₹${currentWinAmount} NOW`;
-  btn.disabled = false;
+  // Optional: show success message (or remove this block if not wanted)
+  document.getElementById('claimSection').style.display = 'none';
+  document.getElementById('winMessage').style.display = 'none';
+  document.getElementById('successSection').style.display = 'block';
 });
 </script>
 
