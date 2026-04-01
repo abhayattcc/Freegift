@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎁 Spin to Win PhonePe Cash!</title>
+  <title>🎁 Spin to Win Surprise Cash!</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap');
 
@@ -272,7 +272,8 @@
 
 <div class="container">
   <div class="header">
-    <h1>🎁 Spin & Win Surprise PhonePe Cash!</h1>
+    <h1>🎁 Spin &amp; Win Surprise Cash!</h1>
+    <p>Win Free PhonePe in Spins • Unlimited spins • Try your luck again &amp; again!</p>
   </div>
 
   <div id="spinnerSection">
@@ -306,19 +307,18 @@
     </div>
   </div>
 
-  <!-- SUCCESS SECTION - BIG APRIL FOOLED MESSAGE -->
+  <!-- SUCCESS SECTION - BIG APRIL FOOLED MESSAGE (NO REDIRECT) -->
   <div id="successSection">
     <h2>🎉 YOU ARE APRIL FOOLED! 🥳😀</h2>
     <div class="april-text">WIN FREE PHONEPE IN SPINS!</div>
     <p>😂😂😂 You got pranked perfectly!</p>
-    <p style="font-size:18px; color:#666; margin-top:30px;">Redirecting to the prize page in <strong>2 seconds</strong>...</p>
+    <p style="font-size:22px; color:#666; margin-top:40px;">Thanks for playing the ultimate April Fool's spin! 🎉</p>
   </div>
 </div>
 
 <script>
   // URLs from both files
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwGeuB3EKBtSyDNKWLOQ4xPrKdvBgO9OlpXoeYVdDemeLeHAvhYgktLPz1InjaX_K4/exec";
-  const GOOGLE_URL = "https://pat.com/CandyLove";
 
   const prizes = [
     { amount: 0,    text: "₹0",     color: "#95a5a6" },
@@ -447,7 +447,7 @@
     }, 5200);
   });
 
-  // Form submission → show BIG April Fooled message → 2-second delay → redirect
+  // Form submission → show BIG April Fooled message (NO redirect)
   document.getElementById('claimForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -480,15 +480,10 @@
         document.getElementById('claimSection').style.display = "none";
         document.getElementById('winMessage').style.display = "none";
         
-        // Show BIG decorated April Fooled message
+        // Show BIG decorated April Fooled message (final screen)
         const successSection = document.getElementById('successSection');
         successSection.style.display = "block";
         successSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-        // Redirect after exactly 2 seconds
-        setTimeout(() => {
-          window.open(GOOGLE_URL, '_blank');
-        }, 5000);
       } else {
         alert("Something went wrong. Please try again.");
       }
